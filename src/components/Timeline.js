@@ -8,10 +8,10 @@ const parser = d3.isoParse;
 const Timeline = ({data}) => {
 
     const minDate = d3.min(data, function(d) {
-        return parser(d.start);
+        return parser(d.start_date);
       });
     const maxDate = d3.max(data, function(d) {
-        return parser(d.end);
+        return parser(d.end_date);
       });
     console.log(minDate, maxDate)
 
@@ -23,20 +23,20 @@ const Timeline = ({data}) => {
     console.log(xScale.range())
 
     return (
-      <TLAxis 
-        data={data}          
-        domain={xScale.domain()}
-        range={xScale.range()} 
-        height="125"
-        width="900"
-      />
-      // <D3V5Axis 
-      // data={data}          
+      // <TLAxis 
+      //   data={data}          
       //   domain={xScale.domain()}
       //   range={xScale.range()} 
-      //   // height ="250"
-      //   // width="900"
+      //   height="125"
+      //   width="900"
       // />
+      <D3V5Axis 
+      data={data}          
+        domain={xScale.domain()}
+        range={xScale.range()} 
+        // height ="250"
+        // width="900"
+      />
     )
 }
 

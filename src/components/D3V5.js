@@ -17,7 +17,7 @@ const D3V5Axis = ({data, domain, range,
         .nice();
 
     const items = d3.nest().key(function(d) {
-        return d.tir;
+        return d.id;
       }).entries(data);
       console.log(items)
 
@@ -32,11 +32,11 @@ const D3V5Axis = ({data, domain, range,
     const parser = d3.isoParse;
 
     const spanX = function(data) {
-    return x(parser(data.start));
+    return x(parser(data.start_date));
     };
     
     const spanW = function(data) {
-    return x(parser(data.end)) - x(parser(data.start));
+    return x(parser(data.end_date)) - x(parser(data.start_date));
     };
     
     const chart = function(item) {
@@ -49,7 +49,7 @@ const D3V5Axis = ({data, domain, range,
             .attr('height', "16px")
             .attr('fill', '#ddf')
             .style("cursor", "pointer")
-            .on("click", d=>console.log('start: ' + d.start + ' end: ' + d.end))
+            .on("click", d=>console.log('start: ' + d.start_date + ' end: ' + d.end_date))
     };
     
     const allCharts = d3.select('.tl-main')
@@ -69,7 +69,7 @@ const D3V5Axis = ({data, domain, range,
 
     const xAxis = (g, x) => g
         // .attr("transform", `translate(0,${height})`)
-        .attr("transform", `translate(45,0)`)
+        // .attr("transform", `translate(45,0)`)
         .attr("color", "#737373")
         .attr("height", "22px")
         .style("padding-top", "16px")
