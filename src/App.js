@@ -7,9 +7,7 @@ library.add(faUndoAlt, faSearchMinus, faSearchPlus, faCoffee)
 
 function App({data}) {
   return (
-    <div>
       <Timeline data={data}/>
-    </div>
   );
 }
 

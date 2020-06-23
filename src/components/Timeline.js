@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import D3V5Axis from './D3V5';
+import TLAxis from './TLAxis'
 
 const parser = d3.isoParse;
 
@@ -22,12 +23,20 @@ const Timeline = ({data}) => {
     console.log(xScale.range())
 
     return (
-      <D3V5Axis           
+      <TLAxis 
+        data={data}          
         domain={xScale.domain()}
-        range={[0,900]} //need to get this working to resize correctly
-        height="200"
+        range={xScale.range()} 
+        height="125"
         width="900"
       />
+      // <D3V5Axis 
+      // data={data}          
+      //   domain={xScale.domain()}
+      //   range={xScale.range()} 
+      //   // height ="250"
+      //   // width="900"
+      // />
     )
 }
 
