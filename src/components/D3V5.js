@@ -9,6 +9,7 @@ const D3V5Axis = ({data, domain, range,
     // width
 }) => {
     const ref = useRef()
+    const ref2 = useRef()
     const spanHeight = 16;
     const pointRadius = spanHeight/4;
     const timeEntries = data.filter(d => d.start_date != null)
@@ -36,6 +37,8 @@ const D3V5Axis = ({data, domain, range,
     const svg = d3.select(ref.current)
         // .attr('width', width)
         // .attr('height', height)
+
+    const svg2 = d3.select(ref2.current)
 
     const parser = d3.isoParse;
 
@@ -77,8 +80,7 @@ const D3V5Axis = ({data, domain, range,
         const svg = d3.select(this);
         return svg.selectAll('circle')
             .data(item => item.values.filter(d => (d.end_date === null)))
-            .enter()
-            .append('circle')
+            .enter().append('circle')
             .attr('cx', d => spanX(d))
             .attr('cy', spanHeight/2)
             .attr('r', pointRadius)
@@ -90,47 +92,47 @@ const D3V5Axis = ({data, domain, range,
     const pointLabels = function(item) {
         const svg = d3.select(this);
         return svg.selectAll('text .point')
-        .data(item => item.values.filter(d => (d.end_date === null)))
-        .enter()
-        .append('text')
-        .attr('class', 'point')
-        .attr('x', d => spanX(d)+ pointRadius)
-        .attr('y', spanHeight/2 + 5)
-        .text(d=>d.title)
+            .data(item => item.values.filter(d => (d.end_date === null)))
+            .enter().append('text')
+            .attr('class', 'point')
+            .attr('x', d => spanX(d)+ pointRadius)
+            .attr('y', spanHeight/2 + 5)
+            .text(d=>d.title)
     }
     
     const allCharts = d3.select('.tl-main')
         .selectAll('svg')
         .data(items)
         .enter().append('svg')
+        .attr('class', 'tl-item')
         .attr('height', spanHeight)
         .each(span, point)
         .each(point)
         .each(spanLabels)
         .each(pointLabels);
 
-    const gx = svg.append("svg");
+    const gx = svg2.append("svg");
 
     const buttonReset = d3.select("#reset")
     const buttonZoomIn = d3.select("#zoomIn")
     const buttonZoomOut = d3.select("#zoomOut")
 
-    // const xAxisY = height - 25;
-
+    const axisHeight = (spanHeight * items.length) + 22;
     const xAxis = (g, x) => g
         // .attr("transform", `translate(0,${height})`)
         // .attr("transform", `translate(45,0)`)
-        .attr("color", "#737373")
-        .attr("height", "22px")
-        .style("padding-top", spanHeight)
-        .style('font-size', '12px')
-        // .style("bottom", 0)
+        .attr("color", "#333") //#737373
+        // .attr("height", "22px")
+        .attr('height', axisHeight + 22)
+        // .attr('class', 'tl-axis')
+        // .style("padding-top", spanHeight/2)
+        .style('font-size', '0.9rem')
         .call(d3.axisBottom(x).ticks(12)
-        // .tickSize(-height)
+        .tickSize(axisHeight)
         )
         .call(g => g.select(".domain").attr("display", "none")) //"none" to hide axis line
-        .call(g => g.selectAll(".tick").selectAll("line").attr("stroke", "white"))
-
+        .call(g => g.selectAll(".tick").selectAll("line").attr("stroke", "#D8D8D8").style("stroke-dasharray", "5 5")) //#bfbfbf
+        
     function zoomed() {
         const transform = d3.event.transform;
         const zx = transform.rescaleX(x).interpolate(d3.interpolateRound);
@@ -141,11 +143,9 @@ const D3V5Axis = ({data, domain, range,
         allCharts.selectAll('circle')
             .attr('cx', d => transform.applyX(spanX(d)));
         allCharts.selectAll('text.span')
-            // .attr('x', d => transform.applyX(spanX(d)+5));
             .attr('x', d => transform.applyX(x(parser(d.end_date))));
         allCharts.selectAll('text.point')
             .attr('x', d => transform.applyX(spanX(d)) + pointRadius);
-            // .attr('x', d => transform.applyX(x(parser(d.end_date))));
       }
     
     function reset() {
@@ -180,6 +180,10 @@ const D3V5Axis = ({data, domain, range,
         <div
             className="tl-main"
             ref={ref}
+        />
+        <div
+            className="tl-axis"
+            ref={ref2}
         />
         </div>
     )

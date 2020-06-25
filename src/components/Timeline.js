@@ -18,7 +18,7 @@ const Timeline = ({data}) => {
     const xScale = 
         d3.scaleTime()
         .domain([minDate,maxDate])
-        .range([0, 900]);
+        .range([0, 1000]);
     
     console.log(xScale.range())
 
