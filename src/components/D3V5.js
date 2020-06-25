@@ -9,6 +9,10 @@ const D3V5Axis = ({data, domain, range,
     // width
 }) => {
     const ref = useRef()
+    const spanHeight = 16;
+    const pointRadius = spanHeight/4;
+    const timeEntries = data.filter(d => d.start_date != null)
+    console.log(timeEntries)
 
     useEffect(() => {
     const x = d3.scaleTime()
@@ -17,9 +21,13 @@ const D3V5Axis = ({data, domain, range,
         .nice();
 
     const items = d3.nest().key(function(d) {
-        return d.id;
-      }).entries(data);
-      console.log(items)
+        if (d.tier != null) {
+            return d.tier
+        } else {
+            return d.id;
+        }
+      }).entries(timeEntries).sort((a, b) => a.key - b.key);
+    console.log(items)
 
     const zoom = d3.zoom()
         // .scaleExtent([0.5, 32])
@@ -31,33 +39,75 @@ const D3V5Axis = ({data, domain, range,
 
     const parser = d3.isoParse;
 
-    const spanX = function(data) {
-    return x(parser(data.start_date));
+    const spanX = function(d) {
+    return x(parser(d.start_date));
     };
     
-    const spanW = function(data) {
-    return x(parser(data.end_date)) - x(parser(data.start_date));
+    const spanW = function(d) {
+    return x(parser(d.end_date)) - x(parser(d.start_date));
     };
     
-    const chart = function(item) {
+    const span = function(item) {
         const svg = d3.select(this);
         return svg.selectAll('rect')
-            .data(item.values).enter()
+            .data(item => item.values.filter(d => (d.end_date != null)))
+            .enter()
             .append('rect')
             .attr('x', d => spanX(d))
             .attr('y', 0).attr('width', d => spanW(d))
-            .attr('height', "16px")
-            .attr('fill', '#ddf')
+            .attr('height', spanHeight)
+            .attr('fill', d => d.fill_color) //#ddf
             .style("cursor", "pointer")
             .on("click", d=>console.log('start: ' + d.start_date + ' end: ' + d.end_date))
     };
+
+    const spanLabels = function(item) {
+        const svg = d3.select(this);
+        return svg.selectAll('text .span')
+        .data(item => item.values.filter(d => (d.end_date != null)))
+        .enter()
+        .append('text')
+        .attr('class', 'span')
+        .attr('x', d => x(parser(d.end_date)) )
+        .attr('y', spanHeight/2 + 5)
+        .text(d=>d.title)
+    }
+
+    const point = function(item){
+        const svg = d3.select(this);
+        return svg.selectAll('circle')
+            .data(item => item.values.filter(d => (d.end_date === null)))
+            .enter()
+            .append('circle')
+            .attr('cx', d => spanX(d))
+            .attr('cy', spanHeight/2)
+            .attr('r', pointRadius)
+            .attr('fill', d => d.fill_color)
+            .style("cursor", "pointer")
+            .on("click", d=>console.log('start: ' + d.start_date + ' end: ' + d.end_date))
+    }
+
+    const pointLabels = function(item) {
+        const svg = d3.select(this);
+        return svg.selectAll('text .point')
+        .data(item => item.values.filter(d => (d.end_date === null)))
+        .enter()
+        .append('text')
+        .attr('class', 'point')
+        .attr('x', d => spanX(d)+ pointRadius)
+        .attr('y', spanHeight/2 + 5)
+        .text(d=>d.title)
+    }
     
     const allCharts = d3.select('.tl-main')
         .selectAll('svg')
         .data(items)
         .enter().append('svg')
-        .attr('height', 16)
-        .each(chart);
+        .attr('height', spanHeight)
+        .each(span, point)
+        .each(point)
+        .each(spanLabels)
+        .each(pointLabels);
 
     const gx = svg.append("svg");
 
@@ -72,24 +122,30 @@ const D3V5Axis = ({data, domain, range,
         // .attr("transform", `translate(45,0)`)
         .attr("color", "#737373")
         .attr("height", "22px")
-        .style("padding-top", "16px")
+        .style("padding-top", spanHeight)
         .style('font-size', '12px')
         // .style("bottom", 0)
         .call(d3.axisBottom(x).ticks(12)
         // .tickSize(-height)
         )
         .call(g => g.select(".domain").attr("display", "none")) //"none" to hide axis line
-        // .call(g => g.selectAll(".tick").selectAll("line").attr("stroke", "white"))
+        .call(g => g.selectAll(".tick").selectAll("line").attr("stroke", "white"))
 
     function zoomed() {
         const transform = d3.event.transform;
         const zx = transform.rescaleX(x).interpolate(d3.interpolateRound);
         gx.call(xAxis, zx);
-        return allCharts.selectAll('rect').attr('x', function(d) {
-            return transform.applyX(spanX(d));
-          }).attr('width', function(d) {
-            return transform.k * spanW(d);
-          });
+        allCharts.selectAll('rect')
+            .attr('x', d => transform.applyX(spanX(d)))
+            .attr('width', d => transform.k * spanW(d));
+        allCharts.selectAll('circle')
+            .attr('cx', d => transform.applyX(spanX(d)));
+        allCharts.selectAll('text.span')
+            // .attr('x', d => transform.applyX(spanX(d)+5));
+            .attr('x', d => transform.applyX(x(parser(d.end_date))));
+        allCharts.selectAll('text.point')
+            .attr('x', d => transform.applyX(spanX(d)) + pointRadius);
+            // .attr('x', d => transform.applyX(x(parser(d.end_date))));
       }
     
     function reset() {
