@@ -4,22 +4,16 @@ import './Timeline.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
-const D3V5Axis = ({data, domain, range, 
+const D3V5Axis = ({ domain, range, timeEntries
     // height,
     // width
 }) => {
+
+    const parser = d3.isoParse;
     const ref = useRef()
     const ref2 = useRef()
     const spanHeight = 16;
     const pointRadius = spanHeight/4;
-    const timeEntries = data.filter(d => d.start_date != null)
-    console.log(timeEntries)
-
-    useEffect(() => {
-    const x = d3.scaleTime()
-        .domain(domain)
-        .range(range)
-        .nice();
 
     const items = d3.nest().key(function(d) {
         if (d.tier != null) {
@@ -28,7 +22,13 @@ const D3V5Axis = ({data, domain, range,
             return d.id;
         }
       }).entries(timeEntries).sort((a, b) => a.key - b.key);
-    console.log(items)
+    // console.log(items)
+
+    useEffect(() => {
+    const x = d3.scaleTime()
+        .domain(domain)
+        .range(range)
+        .nice();
 
     const zoom = d3.zoom()
         // .scaleExtent([0.5, 32])
@@ -39,8 +39,6 @@ const D3V5Axis = ({data, domain, range,
         // .attr('height', height)
 
     const svg2 = d3.select(ref2.current)
-
-    const parser = d3.isoParse;
 
     const spanX = function(d) {
     return x(parser(d.start_date));
@@ -122,14 +120,9 @@ const D3V5Axis = ({data, domain, range,
         // .attr("transform", `translate(0,${height})`)
         // .attr("transform", `translate(45,0)`)
         .attr("color", "#333") //#737373
-        // .attr("height", "22px")
         .attr('height', axisHeight + 22)
-        // .attr('class', 'tl-axis')
-        // .style("padding-top", spanHeight/2)
         .style('font-size', '0.9rem')
-        .call(d3.axisBottom(x).ticks(12)
-        .tickSize(axisHeight)
-        )
+        .call(d3.axisBottom(x).ticks(12).tickSize(axisHeight))
         .call(g => g.select(".domain").attr("display", "none")) //"none" to hide axis line
         .call(g => g.selectAll(".tick").selectAll("line").attr("stroke", "#D8D8D8").style("stroke-dasharray", "5 5")) //#bfbfbf
         

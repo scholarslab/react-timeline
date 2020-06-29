@@ -24,7 +24,6 @@ svg {
     position: absolute;
     top: 0;
     z-index: 2;
-    /* bottom: 0; */
 }
 
 .tl-axis {
@@ -70,42 +69,3 @@ svg {
     background: #333;
     color: #fff;
 }
-
-
-
-/* .tl-timenav .tl-timenav-slider .tl-timenav-slider-background {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    cursor: move;
-    z-index: 6;
-} */
-
-/* .tl-timeaxis {
-    height: 39px;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    z-index: 3;
-} */
-
-/* .tl-timeaxis .tl-timeaxis-content-container {
-    position: relative;
-    bottom: 0;
-    height: 39px;
-} */
-
-/* .tl-timeaxis .tl-timeaxis-content-container .tl-timeaxis-major {
-    z-index: 1;
-    background-color: #fff;
-} */
-
-/* .tl-timeaxis .tl-timeaxis-content-container .tl-timeaxis-major .tl-timeaxis-tick {
-    font-size: 12px;
-    line-height: 14px;
-    color: #737373;
-    width: 100px;
-    margin-left: -50px;
-} */
-

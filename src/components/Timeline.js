@@ -15,6 +15,9 @@ const Timeline = ({data}) => {
       });
     console.log(minDate, maxDate)
 
+    const timeEntries = data.filter(d => d.start_date != null)
+    console.log(timeEntries)
+
     const xScale = 
         d3.scaleTime()
         .domain([minDate,maxDate])
@@ -34,6 +37,7 @@ const Timeline = ({data}) => {
       data={data}          
         domain={xScale.domain()}
         range={xScale.range()} 
+        timeEntries={timeEntries}
         // height ="250"
         // width="900"
       />
